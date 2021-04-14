@@ -75,17 +75,17 @@ class SPHSystem():
             vol   = 0
             direc = np.zeros(2)
             for part in range(self.position.shape[1]):
-                if abs(np.linalg.norm(body.c - self.position[:,part])) < 0.1:
+                if np.linalg.norm(body.c - self.position[:,part]) < 0.1:
                     vol += 1
                     direc += body.c - self.position[:,part]
             if np.linalg.norm(direc) != 0:
                 direc = direc / np.linalg.norm(direc)
 
-            force_grav = np.array([0, 9.81 * body.m])
-            force_buoy = 1 * body.m * 9.81 * vol * direc
+            force_grav = np.array([0, -9.81 * body.m])
+            force_buoy = 1 * body.m * 9.81 * (vol / 50) * direc
             net_forces = force_grav + force_buoy
 
-            body.v += net_forces * self.timestep * (1.0 / body.m)
+            body.v += net_forces * self.timestep
             body.c += body.v * self.timestep
 
             body.v *= np.array([1, 1]) - 1.25 * ((body.c < 0.1) | (body.c > 0.9))

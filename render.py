@@ -11,7 +11,7 @@ from body import Body
 
 _WIDTH  = 200
 _HEIGHT = 200
-_FRAMECOUNT = 150
+_FRAMECOUNT = 300
 _FRAMEDURATION = 16 #~60 fps assuming little processing time
 
 
@@ -23,8 +23,8 @@ def render_sph():
     # initialise SPH
     N = 1500
     masses = np.full((1, N), 1/N)
-    positions = np.random.rand(2, N) * 0.5
-    bodies = [Body(0.1, np.array([0.5, 0.5])), Body(0.01, np.array([0.25, 0.5])), Body(0.00001, np.array([0.75, 0.5]))]
+    positions = np.vstack((np.random.rand(N), np.random.rand(N) * 0.25))
+    bodies = [Body(1.0, np.array([0.5, 0.5])), Body(10.0, np.array([0.25, 0.5]))]#, Body(0.00001, np.array([0.75, 0.5]))]
     system = SPHSystem(masses, positions, bodies)
 
     # initialize transform matrix
@@ -55,7 +55,7 @@ def render_sph():
 
         # draw the objects
         for b in system.body:
-            cv2.circle(img, (floor(b.c[0] * _WIDTH), floor(b.c[1] * _HEIGHT)), floor(_WIDTH/10), (0,0,255), cv2.FILLED)
+            cv2.circle(img, (floor(b.c[0] * _WIDTH), _HEIGHT - floor(b.c[1] * _HEIGHT)), floor(_WIDTH/10), (0,0,255), cv2.FILLED)
 
         #write image
         cv2.imwrite(f'imgcache/{frame}.png', img)
@@ -70,7 +70,7 @@ def render_sph():
         system.update()
 
     frames=[Image.open(f'imgcache/{frame}.png') for frame in range(_FRAMECOUNT)]   
-    frames[0].save('png_to_gif.gif', format='GIF', append_images=frames[1:], save_all=True, duration=_FRAMEDURATION, loop=1)     
+    frames[0].save('png_to_gif.gif', format='GIF', append_images=frames[1:], save_all=True, duration=_FRAMEDURATION, loop=0)     
    
 
 def _post_process(img):
